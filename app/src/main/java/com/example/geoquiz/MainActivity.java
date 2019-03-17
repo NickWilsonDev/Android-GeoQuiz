@@ -14,6 +14,7 @@ public class MainActivity extends AppCompatActivity {
     private Button mTrueButton;
     private Button mFalseButton;
     private Button mNextButton;
+    private Button mPrevButton;
     private TextView mQuestionTextView;
 
     private Question[] mQuestionBank = new Question[] {
@@ -31,6 +32,20 @@ public class MainActivity extends AppCompatActivity {
         mQuestionTextView.setText(question);
     }
 
+    private void checkAnswer(boolean userPressedTrue) {
+        boolean answerIsTrue = mQuestionBank[mCurrentIndex].isAnswerTrue();
+
+        int messageResId = 0;
+
+        if (userPressedTrue == answerIsTrue) {
+            messageResId = R.string.correct_toast;
+        } else {
+            messageResId = R.string.incorrect_toast;
+        }
+
+        Toast.makeText(this, messageResId, Toast.LENGTH_SHORT).show();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,9 +58,7 @@ public class MainActivity extends AppCompatActivity {
             // modern way is probably with lambda expressions and method references now instead of anonymous inner classes
             @Override
             public void onClick(View view) {
-                Toast.makeText(MainActivity.this,
-                                R.string.correct_toast,
-                                Toast.LENGTH_SHORT).show();
+                checkAnswer(true);
             }
         });
 
@@ -53,9 +66,7 @@ public class MainActivity extends AppCompatActivity {
         mFalseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(MainActivity.this,
-                            R.string.incorrect_toast,
-                            Toast.LENGTH_SHORT).show();
+                checkAnswer(false);
             }
         });
 
@@ -64,6 +75,19 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 mCurrentIndex = (mCurrentIndex + 1) % mQuestionBank.length;
+                updateQuestion();
+            }
+        });
+
+        mPrevButton = (Button) findViewById(R.id.previous_button);
+        mPrevButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mCurrentIndex < 1) {
+                    mCurrentIndex = (mQuestionBank.length - (mCurrentIndex + 1)) % mQuestionBank.length;
+                } else {
+                    mCurrentIndex = (mCurrentIndex - 1) % mQuestionBank.length;
+                }
                 updateQuestion();
             }
         });
